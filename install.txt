@@ -1,0 +1,50 @@
+# Pi-Hole
+curl -sSL https://install.pi-hole.net | bash
+
+# Kubernetes
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--tls-san 82.169.194.49" sh -s -
+
+# Cert Manager
+kubectl create namespace cert-manager
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/releases/download/v0.15.1/cert-manager.crds.yaml
+
+customresourcedefinition.apiextensions.k8s.io/issuers.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/orders.acme.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/certificaterequests.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/certificates.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/challenges.acme.cert-manager.io created
+customresourcedefinition.apiextensions.k8s.io/clusterissuers.cert-manager.io created
+
+
+
+
+# Helm -> MacOs
+$ curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+$ chmod 700 get_helm.sh
+$ ./get_helm.sh
+
+Yes, you can curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash if you want to live on the edge.
+
+
+# Create boot script
+sudo chmod 755 /etc/init.d/NameOfYourScript
+
+  #! /bin/sh
+  # /etc/init.d/pihole-server-port
+
+  # Change port
+  sed -ie 's/= 80/= 8080/g' /etc/lighttpd/lighttpd.conf
+
+  # Restart Server
+  /etc/init.d/lighttpd restart
+
+# Test it
+sudo /etc/init.d/NameOfYourScript start
+
+# Start on boot
+sudo update-rc.d NameOfYourScript defaults
+
+# Remove boot script
+sudo update-rc.d -f  NameOfYourScript remove
